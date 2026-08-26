@@ -1,5 +1,5 @@
 package com.financehub.repositories;
 
-public interface UserRepositories {
+public interface CategoryRepositories {
 
 }
