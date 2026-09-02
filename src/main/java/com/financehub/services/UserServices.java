@@ -26,9 +26,7 @@ public class UserServices {
 		Optional<User> obj = userRepositories.findById(id);
 		return obj.orElseThrow(() -> new RuntimeException(id));
 	}
-	public User insert(User user) {
-		return userRepositories.save(user);
-	}
+	
 	public void delete(String id) {
 		try {
 			userRepositories.deleteById(id);
@@ -51,4 +49,8 @@ public class UserServices {
 		entity.setPassword(user.getPassword());
 	}
 	
+	public User cadastrar(User user) {
+		User salvo = userRepositories.save(user);//quero que o repositorio me retorno esse objeto que foi salvo dentro da variavel salva
+		return salvo;
+	}
 }

@@ -8,6 +8,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.financehub.domain.Account;
+import com.financehub.domain.User;
 import com.financehub.exceptions.ResourceNotFoundException;
 import com.financehub.repositories.AccountRepositories;
 
@@ -51,5 +52,9 @@ public class AccountServices {
 			throw new ResourceNotFoundException(id);
 		}
 	}
-	
+	public Account abrirConta(User obj) {
+		Account newAccount = new Account();
+		newAccount.setUser(obj);
+		Account account = accountRepo.save(newAccount);
+		return account;
 }
