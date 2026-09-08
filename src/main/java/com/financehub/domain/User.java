@@ -17,15 +17,14 @@ public class User implements Serializable {
 	@Id
 	private String id;
 	private String name;
-	private Integer cpf;
+	private String cpf;
 	private String email;
 	private String password;
 	@OneToMany(mappedBy = "user")//ELE ENTRA DENTRO DO PARAMENTRO DA CONTRA ACCOUNT E PROCURA PELO O USER.
 	private List<Account> accounts = new ArrayList<>();
 	
 	public User() {}
-	public User(String id,String name,Integer cpf,String email,String password) {
-		this.id=id;
+	public User(String name,String cpf,String email,String password) {
 		this.name=name;
 		this.cpf=cpf;
 		this.email=email;
@@ -43,10 +42,10 @@ public class User implements Serializable {
 	public void setName(String name) {
 		this.name=name;
 	}
-	public Integer getCpf() {
+	public String getCpf() {
 		return cpf;
 	}
-	public void setCpf(Integer cpf) {
+	public void setCpf(String cpf) {
 		this.cpf=cpf;
 	}
 	public String getEmail() {
