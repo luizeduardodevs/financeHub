@@ -13,7 +13,7 @@ public class Transantion implements Serializable{
 	 @Id
 	 private String id;
 	 private String type;
-	 private Integer amount;
+	 private Double amount;
 	 private LocalDateTime dateTime;
 	 private String description;
 	 private Account account;
@@ -32,10 +32,10 @@ public class Transantion implements Serializable{
 	 public void setTyper(String type) {
 		 this.type=type;
 	 }
-	 public Integer getAmount() {
+	 public Double getAmount() {
 		 return amount;
 	 }
-	 public void setAmount(Integer amount) {
+	 public void setAmount(Double amount) {
 		 this.amount=amount;
 	 }
 	 public LocalDateTime getDateTime() {
@@ -56,7 +56,15 @@ public class Transantion implements Serializable{
 	 public void setAccount(Account account) {
 		 this.account=account;
 	 }
-
+	 	 
+	 public Double deposit(Double value) {
+			amount+=value;
+			return amount;
+	 }
+	 public Double withdraw(Double value) {
+		 amount-=value;
+		 return value;
+	 }
 	 @Override
 	 public String toString() {
 		return "Transantion [id=" + id + ", type=" + type + ", amount=" + amount + ", dateTime=" + dateTime

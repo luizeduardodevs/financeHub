@@ -49,6 +49,11 @@ public class UserServices {
 		entity.setPassword(user.getPassword());
 	}
 	
+	public User searchCpf(Integer cpf) {
+		Optional<User> obj = userRepositories.findByCpf(cpf);
+		return obj.orElseThrow(()-> new ResourceNotFoundException(cpf));
+	}
+	
 	public User cadastrar(User user) {
 		User salvo = userRepositories.save(user);//quero que o repositorio me retorno esse objeto que foi salvo dentro da variavel salva
 		return salvo;

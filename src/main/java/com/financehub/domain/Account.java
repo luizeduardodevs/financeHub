@@ -17,14 +17,14 @@ public class Account implements Serializable {
 	private String id;
 	private Integer numberAccount;
 	private String type;
-	private Integer value;
+	private Double value;
 	private String status;
 	@ManyToOne
 	private User user;
 	private LocalDate createdAt;
 	
 	public Account() {}
-	public Account(String id, Integer numberAccount, String type, Integer value, String status,User user,LocalDate createdAt) {
+	public Account(String id, Integer numberAccount, String type, Double value, String status,User user,LocalDate createdAt) {
 		this.id=id;
 		this.numberAccount=numberAccount;
 		this.type=type;
@@ -51,10 +51,10 @@ public class Account implements Serializable {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public Integer getValue() {
+	public Double getValue() {
 		return value;
 	}
-	public void setValue(Integer value) {
+	public void setValue(Double value) {
 		this.value = value;
 	}
 	public String getStatus() {
