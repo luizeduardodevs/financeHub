@@ -62,7 +62,7 @@ public class AccountServices {
 		return account;
 	}
 	
-	public Account seacherUser(Integer cpf) {
+	public Account seacherUser(String cpf) {
 		Optional<User> obj = userRepositories.findByCpf(cpf);
 		User user = obj.orElseThrow(()-> new ResourceNotFoundException(obj));//user representa o user que foi encontrado atraves do cpf dentro do argumento.
 	//dentro da exceção fala se nao achar lançe a exceção, mas se achar voce salvou dentro do user.

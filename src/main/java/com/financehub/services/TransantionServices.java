@@ -36,7 +36,7 @@ public class TransantionServices {
 	public Transantion insert(Transantion transantion) {
 		return transantionRepo.save(transantion);
 	}
-	public Double transfer(Double value,Integer cpf, Account account) {
+	/*public Double transfer(Double value,Integer cpf, Account account) {
 		if(value <= account.getValue() && value > 0)  {
 			Optional<User> user = userRepositories.findByCpf(cpf);
 			User userOne = user.orElseThrow(() -> new ResourceNotFoundException(user));
@@ -52,6 +52,6 @@ public class TransantionServices {
 		}
 		
 		
-	 }
+	 }*/
 
 }

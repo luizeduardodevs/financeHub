@@ -1,13 +1,14 @@
 package com.financehub.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class User implements Serializable {
@@ -15,13 +16,14 @@ public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	private String name;
 	private String cpf;
 	private String email;
 	private String password;
-	@OneToMany(mappedBy = "user")//ELE ENTRA DENTRO DO PARAMENTRO DA CONTRA ACCOUNT E PROCURA PELO O USER.
-	private List<Account> accounts = new ArrayList<>();
+	@OneToOne(mappedBy = "user")//ELE ENTRA DENTRO DO PARAMENTRO DA CONTRA ACCOUNT E PROCURA PELO O USER.
+	private Account accounts;
 	
 	public User() {}
 	public User(String name,String cpf,String email,String password) {
@@ -60,10 +62,10 @@ public class User implements Serializable {
 	public void setPassword(String password) {
 		this.password=password;
 	}
-	public List<Account> getAccounts() {
+	public Account getAccounts() {
 		return accounts;
 	}
-	public void setAccounts(List<Account> accounts) {
+	public void setAccounts(Account accounts) {
 		this.accounts = accounts;
 	}
 	

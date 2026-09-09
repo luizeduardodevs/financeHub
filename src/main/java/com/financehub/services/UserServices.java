@@ -49,7 +49,7 @@ public class UserServices {
 		entity.setPassword(user.getPassword());
 	}
 	
-	public User searchCpf(Integer cpf) {
+	public User searchCpf(String cpf) {
 		Optional<User> obj = userRepositories.findByCpf(cpf);
 		return obj.orElseThrow(()-> new ResourceNotFoundException(cpf));
 	}

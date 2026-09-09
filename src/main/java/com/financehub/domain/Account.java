@@ -31,7 +31,7 @@ public class Account implements Serializable {
 		this.value=value;
 		this.status=status;
 		this.user=user;
-		this.createdAt=createdAt;
+		this.createdAt=LocalDate.now();//pra mostrar que foi criado no dia atual
 	}
 	public String getId() {
 		return id;

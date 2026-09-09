@@ -7,5 +7,5 @@ import com.financehub.domain.User;
 
 public interface UserRepositories extends JpaRepository<User, String> {
 	
-	Optional <User> findByCpf(Integer cpf);
+	Optional <User> findByCpf(String cpf);
 }
