@@ -1,9 +1,9 @@
 package com.financehub.domain;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,10 +19,11 @@ public class User implements Serializable {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	private String name;
+	@Column(unique=true)
 	private String cpf;
 	private String email;
 	private String password;
-	@OneToOne(mappedBy = "user")//ELE ENTRA DENTRO DO PARAMENTRO DA CONTRA ACCOUNT E PROCURA PELO O USER.
+	@OneToOne(mappedBy = "user")//ELE ENTRA DENTRO DO PARAMENTRO DA CONTRA ACCOUNT E PROCURA PELO O USER. é usada como espelho, pois as ações serao executadas atraves do account
 	private Account accounts;
 	
 	public User() {}

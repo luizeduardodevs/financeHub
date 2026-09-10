@@ -1,7 +1,7 @@
 package com.financehub.console;
 
-import com.financehub.repositories.AccountRepositories;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,22 +10,26 @@ import org.springframework.stereotype.Component;
 
 import com.financehub.domain.Account;
 import com.financehub.domain.User;
+import com.financehub.repositories.AccountRepositories;
+import com.financehub.repositories.UserRepositories;
 import com.financehub.services.AccountServices;
 import com.financehub.services.UserServices;
 @Component//fala que essa calsse faz parte da aplicação cria e gerencia um objeto dela 
 public class FinanceHubConsole implements CommandLineRunner {
+	private final UserRepositories userRepositories;
 	private final AccountRepositories accountRepositories;
 	@Autowired
 	private UserServices userService;
 	@Autowired
 	private AccountServices accountService;
 
-	FinanceHubConsole(AccountRepositories accountRepositories) {
+	FinanceHubConsole(AccountRepositories accountRepositories, UserRepositories userRepositories) {
 		this.accountRepositories = accountRepositories;
+		this.userRepositories = userRepositories;
 	}
 	
 	public void run(String... args) throws Exception {
-	
+	//ARRUMA LOGICA , POIS QUNADO INFORMAR O CPF QUE JA EXISTE TRAVA.
 	Scanner sc = new Scanner(System.in);
 	DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
@@ -39,12 +43,14 @@ public class FinanceHubConsole implements CommandLineRunner {
 		while (cpf.length() != 11) {
 			System.out.print("Enter your correctly CPF: ");
 			cpf = sc.nextLine();
+			String part1 = cpf.substring(0,3);
+			String part2 =cpf.substring(3,6);
+			String part3 = cpf.substring(6,9);
+			String part4 =cpf.substring(9,11);
+			cpf = (part1 + "." + part2 + "." + part3 + "-" + part4);
 		}
-		String part1 = cpf.substring(0,3);
-		String part2 =cpf.substring(3,6);
-		String part3 = cpf.substring(6,9);
-		String part4 =cpf.substring(9,11);
-		cpf = (part1 + "." + part2 + "." + part3 + "-" + part4);
+		
+		if(!userRepositories.findByCpf(cpf).isPresent()) {
 		System.out.print("Enter your name: ");
 		String name = sc.nextLine();
 		System.out.print("Enter your e-mail address: ");
@@ -58,8 +64,9 @@ public class FinanceHubConsole implements CommandLineRunner {
 			accountService.openAccount(user);
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
-		}
-	}
+		}	
+	
+	
 	System.out.print("Enter your cpf: ");
 	cpf = sc.nextLine();
 	while(cpf.length() != 11) {
@@ -72,24 +79,30 @@ public class FinanceHubConsole implements CommandLineRunner {
 	String part4 =cpf.substring(9,11);
 	cpf = (part1 + "." + part2 + "." + part3 + "-" + part4);
 	
-	User user = userService.searchCpf(cpf);
+	user = userService.searchCpf(cpf);
 	System.out.print("Enter your password: ");
 	String passwords = sc.nextLine();
 		while(!passwords.equals(user.getPassword())) {
 			System.out.print("Enter your password: ");
 			passwords = sc.nextLine();
 	
-	}if(cpf.equals(user.getCpf()) && passwords.equals(user.getPassword())) {
-		Account account = user.getAccounts();
-		System.out.println("which the value inital of account will yours be:");
-		Double value = sc.nextDouble();
-		account.setValue(value);
-		accountRepositories.save(account);
 	}
-
-	
-	
-	
-	
+	Optional<Account> obj = accountRepositories.findByUser(user);
+	Account account = obj.orElseThrow();
+	System.out.println("which the value inital of account will yours be:");
+	Double value = sc.nextDouble();
+	account.setValue(value);
+	accountRepositories.save(account);
 	}
+	}else {
+		User user = userService.searchCpf(cpf);//tem que achar o usuario
+		System.out.print("Enter your password: ");
+		String passwords = sc.nextLine();
+			while(!passwords.equals(user.getPassword())) {
+				System.out.print("Enter your password: ");
+				passwords = sc.nextLine();}
+		
+}
+	}
+	
 }

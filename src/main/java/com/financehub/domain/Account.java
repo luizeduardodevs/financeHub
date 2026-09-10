@@ -5,8 +5,10 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Account implements Serializable {
@@ -14,13 +16,14 @@ public class Account implements Serializable {
 	private static final long serialVersionUID = 0L;
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	private Integer numberAccount;
 	private String type;
 	private Double value;
 	private String status;
-	@ManyToOne
-	private User user;
+	@OneToOne
+	private User user;//esse é o dono da relação, entao normalmente a logica deve ser puxada atraves das classes account
 	private LocalDate createdAt;
 	
 	public Account() {}
