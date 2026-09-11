@@ -13,6 +13,7 @@ import com.financehub.domain.User;
 import com.financehub.repositories.AccountRepositories;
 import com.financehub.repositories.UserRepositories;
 import com.financehub.services.AccountServices;
+import com.financehub.services.TransantionServices;
 import com.financehub.services.UserServices;
 @Component//fala que essa calsse faz parte da aplicação cria e gerencia um objeto dela 
 public class FinanceHubConsole implements CommandLineRunner {
@@ -22,6 +23,8 @@ public class FinanceHubConsole implements CommandLineRunner {
 	private UserServices userService;
 	@Autowired
 	private AccountServices accountService;
+	@Autowired
+	private TransantionServices transantionServices;
 
 	FinanceHubConsole(AccountRepositories accountRepositories, UserRepositories userRepositories) {
 		this.accountRepositories = accountRepositories;
@@ -32,6 +35,8 @@ public class FinanceHubConsole implements CommandLineRunner {
 	//ARRUMA LOGICA , POIS QUNADO INFORMAR O CPF QUE JA EXISTE TRAVA.
 	Scanner sc = new Scanner(System.in);
 	DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	Account account = null;
+	User user = null;
 	
 	String cpf = null;
 	System.out.print("Welcome to FinanceHub ");
@@ -43,13 +48,13 @@ public class FinanceHubConsole implements CommandLineRunner {
 		while (cpf.length() != 11) {
 			System.out.print("Enter your correctly CPF: ");
 			cpf = sc.nextLine();
-			String part1 = cpf.substring(0,3);
-			String part2 =cpf.substring(3,6);
-			String part3 = cpf.substring(6,9);
-			String part4 =cpf.substring(9,11);
-			cpf = (part1 + "." + part2 + "." + part3 + "-" + part4);
 		}
-		
+		String part1 = cpf.substring(0,3);
+		String part2 =cpf.substring(3,6);
+		String part3 = cpf.substring(6,9);
+		String part4 =cpf.substring(9,11);
+		cpf = (part1 + "." + part2 + "." + part3 + "-" + part4);
+	}
 		if(!userRepositories.findByCpf(cpf).isPresent()) {
 		System.out.print("Enter your name: ");
 		String name = sc.nextLine();
@@ -57,10 +62,10 @@ public class FinanceHubConsole implements CommandLineRunner {
 		String email = sc.nextLine();
 		System.out.print("Enter your password: ");
 		String password = sc.nextLine();
-		User user = new User(name,cpf,email,password);
+		user = new User(name,cpf,email,password);
 		try{
 			User salvo = userService.cadastrar(user);
-			System.out.println("cpf gerado" + salvo.getCpf());
+			System.out.println("cpf gerado " + salvo.getCpf());
 			accountService.openAccount(user);
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
@@ -88,21 +93,64 @@ public class FinanceHubConsole implements CommandLineRunner {
 	
 	}
 	Optional<Account> obj = accountRepositories.findByUser(user);
-	Account account = obj.orElseThrow();
+	account = obj.orElseThrow();
 	System.out.println("which the value inital of account will yours be:");
 	Double value = sc.nextDouble();
 	account.setValue(value);
 	accountRepositories.save(account);
-	}
 	}else {
-		User user = userService.searchCpf(cpf);//tem que achar o usuario
+		user = userService.searchCpf(cpf);//tem que achar o usuario
 		System.out.print("Enter your password: ");
 		String passwords = sc.nextLine();
 			while(!passwords.equals(user.getPassword())) {
 				System.out.print("Enter your password: ");
-				passwords = sc.nextLine();}
+				passwords = sc.nextLine();
+				}
+			Optional<Account> obj = accountRepositories.findByUser(user);
+			account = obj.orElseThrow();
+			System.out.println("Total value: " + account.getValue());
+			if(account.getValue() == null) {
+				System.out.println("which the value inital of account will yours be:");
+				Double value = sc.nextDouble();
+				account.setValue(value);
+				accountRepositories.save(account);
+				System.out.println("Total value " + account.getValue());
+			}
+	}
+	
+	System.out.println("Do you want to do a transfer?");
+	String transfer = sc.nextLine();
+	if(transfer.equals("yes")) {
+		System.out.println("which the value what you will make the tansfer:");
+		Double value = sc.nextDouble();
+		System.out.println("For who´s will be done the transfer? report the cpf: ");
+		sc.nextLine();
+		cpf = sc.nextLine();
+		while(cpf.length() != 11) {
+			System.out.print("Enter your correctly CPF: ");
+			cpf = sc.nextLine();
+		}
+		String part1 = cpf.substring(0,3);
+		String part2 =cpf.substring(3,6);
+		String part3 = cpf.substring(6,9);
+		String part4 =cpf.substring(9,11);
+		cpf = (part1 + "." + part2 + "." + part3 + "-" + part4);
+		User userDestinary = userService.searchCpf(cpf);
+		System.out.println("Do you really want to make transfer for the people? " + userDestinary.getName()+ " with the "+ userDestinary.getCpf());
+		yesOrNo = sc.nextLine();
+		if(yesOrNo.equals("yes")){
+			transantionServices.transfer(value, cpf, account);	
+			accountRepositories.save(account);
+			System.out.println(" Operation successfully completed " + account.getValue());
+			}
+		}
+	
+	System.out.println();
 		
-}
+		
+		
+		
+		
 	}
 	
 }
