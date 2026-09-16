@@ -45,7 +45,6 @@ public class AccountServices {
 	public void updateData(Account entity, Account account) {
 		entity.setStatus(account.getStatus());
 		entity.setType(account.getType());
-		entity.setCreatedAt(account.getCreatedAt());
 		entity.setNumberAccount(account.getNumberAccount());
 	}
 	public void delete(String id) {

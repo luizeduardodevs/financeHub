@@ -3,6 +3,8 @@ package com.financehub.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +26,7 @@ public class User implements Serializable {
 	private String email;
 	private String password;
 	@OneToOne(mappedBy = "user")//ELE ENTRA DENTRO DO PARAMENTRO DA CONTRA ACCOUNT E PROCURA PELO O USER. é usada como espelho, pois as ações serao executadas atraves do account
+	@JsonIgnore //impede que no postman fique indo e voltando
 	private Account accounts;
 	
 	public User() {}
