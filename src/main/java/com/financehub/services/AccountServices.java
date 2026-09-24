@@ -1,7 +1,9 @@
 package com.financehub.services;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -57,6 +59,8 @@ public class AccountServices {
 	public Account openAccount(User obj) {
 		Account newAccount = new Account();
 		newAccount.setUser(obj);
+		newAccount.setCreatedAt(LocalDate.now());
+		newAccount.setNumberAccount(numberOfAccount());
 		Account account = accountRepo.save(newAccount);
 		return account;
 	}
@@ -68,5 +72,11 @@ public class AccountServices {
 		Optional <Account> account = accountRepo.findByUser(user);//atraves do user encontrado pelo cpf informado do metodo, achamos a conta desse cpf, pois o cpf e um aributo do user.
 		return account.orElseThrow(()-> new ResourceNotFoundException(account));
 		
+	}
+	
+	public Integer numberOfAccount() {
+		Random number = new Random();
+		Integer numbers = 10000 + number.nextInt(99999);
+		return numbers;
 	}
 }
