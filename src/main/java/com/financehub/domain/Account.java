@@ -2,13 +2,17 @@ package com.financehub.domain;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -27,6 +31,9 @@ public class Account implements Serializable {
 	@OneToOne
 	private User user;//esse é o dono da relação, entao normalmente a logica deve ser puxada atraves das classes account
 	private LocalDate createdAt;
+	@OneToMany(mappedBy = "account")
+	@JsonIgnore
+	private List<PixKey> pixKey;
 	
 	public Account() {}
 	public Account(String id, Integer numberAccount, String type, Double value, String status,User user,LocalDate createdAt) {
