@@ -11,6 +11,7 @@ import com.financehub.domain.Transantion;
 import com.financehub.domain.User;
 import com.financehub.exceptions.ResourceNotFoundException;
 import com.financehub.repositories.AccountRepositories;
+import com.financehub.repositories.PixKeyRepositories;
 import com.financehub.repositories.TransantionRepositories;
 import com.financehub.repositories.UserRepositories;
 
@@ -23,6 +24,8 @@ public class TransantionServices {
 	private UserRepositories userRepositories;
 	@Autowired
 	private AccountRepositories accountRepo;
+	@Autowired
+	private PixKeyRepositories pixKeyRepo;
 	
 	
 	public List<Transantion> findAll(){
@@ -51,7 +54,10 @@ public class TransantionServices {
 			throw new RuntimeException("Value can´t transfering for puther account destinary"+account);
 		}
 		
-		
 	 }
+	
+	public Transantion pix(Account account, String destiny, double value) {
+		
+	}
 
 }

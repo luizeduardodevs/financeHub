@@ -5,5 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.financehub.domain.PixKey;
 
 public interface PixKeyRepositories extends JpaRepository <PixKey, String> {
-
+	boolean existsByKey(String key);
+	
+	PixKey findByKey(String key);
 }
