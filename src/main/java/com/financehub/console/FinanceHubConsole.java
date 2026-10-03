@@ -1,9 +1,11 @@
 package com.financehub.console;
 
+import com.financehub.repositories.PixKeyRepositories;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -14,10 +16,12 @@ import com.financehub.domain.User;
 import com.financehub.repositories.AccountRepositories;
 import com.financehub.repositories.UserRepositories;
 import com.financehub.services.AccountServices;
+import com.financehub.services.PixKeyServices;
 import com.financehub.services.TransantionServices;
 import com.financehub.services.UserServices;
 @Component//fala que essa calsse faz parte da aplicação cria e gerencia um objeto dela 
 public class FinanceHubConsole implements CommandLineRunner {
+	private final PixKeyRepositories pixKeyRepositories;
 	private final UserRepositories userRepositories;
 	private final AccountRepositories accountRepositories;
 	@Autowired
@@ -26,10 +30,13 @@ public class FinanceHubConsole implements CommandLineRunner {
 	private AccountServices accountService;
 	@Autowired
 	private TransantionServices transantionServices;
+	@Autowired
+	private PixKeyServices pixKeyServices;
 
-	FinanceHubConsole(AccountRepositories accountRepositories, UserRepositories userRepositories) {
+	FinanceHubConsole(AccountRepositories accountRepositories, UserRepositories userRepositories, PixKeyRepositories pixKeyRepositories) {
 		this.accountRepositories = accountRepositories;
 		this.userRepositories = userRepositories;
+		this.pixKeyRepositories = pixKeyRepositories;
 	}
 	
 	public void run(String... args) throws Exception {
@@ -108,14 +115,44 @@ public class FinanceHubConsole implements CommandLineRunner {
 	if(account.getValue() == null) {
 		System.out.println("which the value inital of account will yours be:");
 		Double value = sc.nextDouble();
+		sc.nextLine();
 		account.setValue(value);
 		accountRepositories.save(account);
 		System.out.println("Total value " + account.getValue());
 		sc.nextLine();}
-		
-	System.out.println("Do you want to do a transfer?");
+	System.out.println("Do you want to register a Pix key?");
+	String transfers = sc.nextLine();
+	if(transfers.equals("yes")) {
+		System.out.println("what will the key Pix be? ");
+		String keyPix = sc.nextLine();
+		switch(keyPix) {
+			case "Email":
+				System.out.println("Enter your e-mail: ");
+				String email = sc.nextLine();
+				
+				pixKeyServices.createdKeyPix(account, email);
+				break;
+			case "Celular":
+				System.out.println("Enter your Cell phone: ");
+				String cellphone = sc.nextLine();
+				
+				pixKeyServices.createdKeyPix(account, cellphone);
+				break;
+			case "Aleatoria":
+				String randomKey = UUID.randomUUID().toString();
+				pixKeyServices.createdKeyPix(account, randomKey);
+				
+				System.out.println("Your Key random is "+randomKey);
+				break;
+			default:
+				System.out.println("not found");
+		}
+	}
+	
+	
+	System.out.println("Do you want to do a transfer or a pix?");
 	String transfer = sc.nextLine();
-	if(transfer.equals("yes")) {
+	if(transfer.equals("transfer")) {
 		System.out.println("which the value what you will make the tansfer:");
 		Double value = sc.nextDouble();
 		System.out.println("For who´s will be done the transfer? report the cpf: ");
@@ -139,10 +176,17 @@ public class FinanceHubConsole implements CommandLineRunner {
 			System.out.println("Operation successfully completed, your new value of Account is of " + account.getValue());
 			}
 		}
+	if(transfer.equals("pix")) {
+		System.out.println("which the value what you will make the tansfer:");
+		Double value = sc.nextDouble();
+		System.out.println("what is the key Pix for the transfer:");
+		String keyPixs = sc.nextLine();
+		transantionServices.pix(account, keyPixs, value);
+		System.out.println("Operation successfully completed. " + account.getValue() );
+	}
 	
 		
-		
-		
+	
 		
 		
 	}

@@ -1,21 +1,25 @@
 package com.financehub.domain;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
-public class PixKey {
+@Table(name = "pix_key")
+public class PixKey implements Serializable {
+	private static final long serialVersionUID = 0L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
+	@Column(name = "pix_key")
 	private String key;
 	private String type;
 	@ManyToOne

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.financehub.domain.Account;
+import com.financehub.domain.PixKey;
 import com.financehub.domain.Transantion;
 import com.financehub.domain.User;
 import com.financehub.exceptions.ResourceNotFoundException;
@@ -56,8 +57,18 @@ public class TransantionServices {
 		
 	 }
 	
-	public Transantion pix(Account account, String destiny, double value) {
-		
+	public Double pix(Account account, String destiny, double value) {
+		PixKey pixs = pixKeyRepo.findByKey(destiny);
+		Account secundary = pixs.getAccount();
+		if(value <= account.getValue() && value > 0) {
+		secundary.setValue(secundary.getValue() + value);
+		account.setValue(account.getValue() - value);
+		accountRepo.save(secundary);
+		accountRepo.save(account);
+		return secundary.getValue();
+		}else {
+			throw new RuntimeException("Pix don´t realized");
+		}
 	}
 
 }
