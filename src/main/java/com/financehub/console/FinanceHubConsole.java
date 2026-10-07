@@ -1,6 +1,5 @@
 package com.financehub.console;
 
-import com.financehub.repositories.PixKeyRepositories;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
@@ -12,8 +11,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.financehub.domain.Account;
+import com.financehub.domain.PixKey;
 import com.financehub.domain.User;
 import com.financehub.repositories.AccountRepositories;
+import com.financehub.repositories.PixKeyRepositories;
 import com.financehub.repositories.UserRepositories;
 import com.financehub.services.AccountServices;
 import com.financehub.services.PixKeyServices;
@@ -76,6 +77,11 @@ public class FinanceHubConsole implements CommandLineRunner {
 			User salvo = userService.cadastrar(user);
 			System.out.println("Account created with the CPF of: " + salvo.getCpf());
 			accountService.openAccount(salvo);//criou o usuario
+			System.out.println("which the value inital of account will yours be:");
+			Double value = sc.nextDouble();
+			account.setValue(value);
+			accountRepositories.save(account);
+			System.out.println("Total value " + account.getValue());
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 		}	
@@ -96,19 +102,7 @@ public class FinanceHubConsole implements CommandLineRunner {
 		String passwords = sc.nextLine();
 			while(!passwords.equals(user.getPassword())) {
 				System.out.print("Enter your password:");
-				passwords = sc.nextLine();
-				}//acaba aqui
-			Optional<Account> obj = accountRepositories.findByUser(user);
-			account = obj.orElseThrow();
-			if(account.getValue() == null) {
-				System.out.println("which the value inital of account will yours be:");
-				Double value = sc.nextDouble();
-				account.setValue(value);
-				accountRepositories.save(account);
-				System.out.println("Total value " + account.getValue());
-			}
-			System.out.println("Total value: " + account.getValue());
-	}
+				passwords = sc.nextLine();}//acaba aqui
 	Optional<Account> obj = accountRepositories.findByUser(user);
 	account = obj.orElseThrow();
 	//inserido o valor na conta valor 
@@ -119,9 +113,12 @@ public class FinanceHubConsole implements CommandLineRunner {
 		account.setValue(value);
 		accountRepositories.save(account);
 		System.out.println("Total value " + account.getValue());
-		sc.nextLine();}
+		sc.nextLine();
+		}
+	
 	System.out.println("Do you want to register a Pix key?");
 	String transfers = sc.nextLine();
+	boolean createdOrNo = false;
 	if(transfers.equals("yes")) {
 		System.out.println("what will the key Pix be? ");
 		String keyPix = sc.nextLine();
@@ -131,24 +128,68 @@ public class FinanceHubConsole implements CommandLineRunner {
 				String email = sc.nextLine();
 				
 				pixKeyServices.createdKeyPix(account, email);
+				createdOrNo = pixKeyRepositories.existsByKey(email);
+				System.out.println("Your Key random is "+email);
 				break;
 			case "Celular":
 				System.out.println("Enter your Cell phone: ");
 				String cellphone = sc.nextLine();
 				
 				pixKeyServices.createdKeyPix(account, cellphone);
+				createdOrNo = pixKeyRepositories.existsByKey(cellphone);
+				System.out.println("Your Key random is "+cellphone);
 				break;
 			case "Aleatoria":
 				String randomKey = UUID.randomUUID().toString();
 				pixKeyServices.createdKeyPix(account, randomKey);
 				
+				createdOrNo = pixKeyRepositories.existsByKey(randomKey);
 				System.out.println("Your Key random is "+randomKey);
 				break;
 			default:
-				System.out.println("not found");
+				throw new RuntimeException("not found");
+		}
+		System.out.println("Do you want to do a transfer or a pix?");
+		String transfer = sc.nextLine();
+		if(transfer.equals("transfer")) {
+			System.out.println("which the value what you will make the tansfer:");
+			Double value = sc.nextDouble();
+			System.out.println("For who´s will be done the transfer? report the cpf: ");
+			sc.nextLine();
+			cpf = sc.nextLine();
+			while(cpf.length() != 11) {
+				System.out.print("Enter your correctly CPF: ");
+				cpf = sc.nextLine();
+			}
+			part1 = cpf.substring(0,3);
+			part2 =cpf.substring(3,6);
+			part3 = cpf.substring(6,9);
+			part4 =cpf.substring(9,11);
+			cpf = (part1 + "." + part2 + "." + part3 + "-" + part4);
+			User userDestinary = userService.searchCpf(cpf);
+			System.out.println("Do you really want to make transfer for the people? " + userDestinary.getName()+ " with the "+ userDestinary.getCpf());
+			yesOrNo = sc.nextLine();
+			if(yesOrNo.equals("yes")){
+				transantionServices.transfer(value, cpf, account);	
+				accountRepositories.save(account);
+				System.out.println("Operation successfully completed, your new value of Account is of " + account.getValue());
+				}
+			}
+		if(transfer.equals("pix")) {
+			System.out.println("which the value what you will make the tansfer:");
+			Double value = sc.nextDouble();
+			sc.nextLine();
+			System.out.println("what is the key Pix for the transfer:");
+			String keyPixs = sc.nextLine();
+			PixKey accountKey = pixKeyRepositories.findByKey(keyPixs);
+			System.out.println("Chave informada: " + keyPixs);
+			Account accountOn = accountKey.getAccount();
+			System.out.println("Chave informada: " + accountOn);
+			transantionServices.pix(accountOn, keyPixs, value);
+			System.out.println("Operation successfully completed. " + account.getValue() );
 		}
 	}
-	
+	}
 	
 	System.out.println("Do you want to do a transfer or a pix?");
 	String transfer = sc.nextLine();
@@ -179,16 +220,18 @@ public class FinanceHubConsole implements CommandLineRunner {
 	if(transfer.equals("pix")) {
 		System.out.println("which the value what you will make the tansfer:");
 		Double value = sc.nextDouble();
+		sc.nextLine();
 		System.out.println("what is the key Pix for the transfer:");
 		String keyPixs = sc.nextLine();
-		transantionServices.pix(account, keyPixs, value);
-		System.out.println("Operation successfully completed. " + account.getValue() );
+		PixKey accountKey = pixKeyRepositories.findByKey(keyPixs);
+		Account accountOn = accountKey.getAccount();
+		
+		transantionServices.pix(accountOn, keyPixs, value);
+		System.out.println("Operation successfully completed " + account.getValue());
+		System.out.println("New value of account is: "+ accountOn.getValue() + " " + accountOn.getUser().getName());
 	}
 	
 		
-	
-		
-		
 	}
-	
+		
 }
